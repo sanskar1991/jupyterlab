@@ -4,6 +4,11 @@
 {# Set a dummy variable - we just want the side effect of the update. #}
 {% set _ = page_config_full.update(baseUrl=base_url, wsUrl=ws_url) %}
 
+  <input id="disable_upload" type="hidden" value={{page_config_full['isUploadEnable']}}>
+  <input id="disable_download" type="hidden" value={{page_config_full['isDownloadEnable']}}>
+  <input id="enable_drag&drop" type="hidden" value={{page_config_full['isDragDropEnabled']}}>
+  <input id="enable_exportNotebook" type="hidden" value={{page_config_full['isExportNotebookEnable']}}>
+
   <script id="jupyter-config-data" type="application/json">
     {{ page_config_full | tojson }}
   </script>

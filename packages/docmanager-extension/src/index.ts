@@ -50,6 +50,8 @@ import { IDisposable } from '@lumino/disposable';
 
 import { Widget } from '@lumino/widgets';
 
+let isDownloadEnable = (<HTMLInputElement>document.getElementById('disable_download')).value;
+
 /**
  * The command IDs used by the document manager plugin.
  */
@@ -467,6 +469,7 @@ function addCommands(
     mnemonic: args => (args['mnemonic'] as number) || -1
   });
 
+  if (isDownloadEnable == "True"){
   commands.addCommand(CommandIDs.openBrowserTab, {
     execute: args => {
       const path =
@@ -489,6 +492,38 @@ function addCommands(
     icon: args => (args['icon'] as string) || '',
     label: () => trans.__('Open in New Browser Tab')
   });
+  }
+
+  if (isDownloadEnable == "True"){
+    commands.addCommand(CommandIDs.download, {
+      label: trans.__('Download'),
+      caption: trans.__('Download the file to your computer'),
+      isEnabled,
+      execute: () => {
+        // Checks that shell.currentWidget is valid:
+        if (isEnabled()) {
+          // if (isDownloadEnable == "True"){
+          const context = docManager.contextForWidget(shell.currentWidget!);
+          if (!context) {
+            return showDialog({
+              title: trans.__('Cannot Download'),
+              body: trans.__('No context found for current widget!'),
+              buttons: [Dialog.okButton({ label: trans.__('OK') })]
+            });
+          }
+          return context.download();
+          // }
+          // else {
+          //   showDialog({
+          //     title: "Cannot Download",
+          //     body: "This operation cannot be performed!",
+          //     buttons: [Dialog.okButton()]
+          //   }).catch(e => console.log(e));
+          // }
+        }
+      }
+    });
+  }
 
   commands.addCommand(CommandIDs.reload, {
     label: () =>
@@ -665,26 +700,6 @@ function addCommands(
           });
         }
         return context.saveAs();
-      }
-    }
-  });
-
-  commands.addCommand(CommandIDs.download, {
-    label: trans.__('Download'),
-    caption: trans.__('Download the file to your computer'),
-    isEnabled,
-    execute: () => {
-      // Checks that shell.currentWidget is valid:
-      if (isEnabled()) {
-        const context = docManager.contextForWidget(shell.currentWidget!);
-        if (!context) {
-          return showDialog({
-            title: trans.__('Cannot Download'),
-            body: trans.__('No context found for current widget!'),
-            buttons: [Dialog.okButton({ label: trans.__('OK') })]
-          });
-        }
-        return context.download();
       }
     }
   });

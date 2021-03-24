@@ -240,6 +240,8 @@ namespace CommandIDs {
   export const replaceSelection = 'notebook:replace-selection';
 }
 
+let isExportNotebookEnable = (<HTMLInputElement>document.getElementById('enable_exportNotebook')).value;
+
 /**
  * The name of the factory that creates notebooks.
  */
@@ -1255,6 +1257,8 @@ function addCommands(
     },
     isEnabled
   });
+
+  if (isExportNotebookEnable == "True") {
   commands.addCommand(CommandIDs.exportToFormat, {
     label: args => {
       const formatLabel = args['label'] as string;
@@ -1293,6 +1297,7 @@ function addCommands(
     },
     isEnabled
   });
+  }
   commands.addCommand(CommandIDs.restartClear, {
     label: trans.__('Restart Kernel and Clear All Outputs…'),
     execute: args => {
@@ -2164,6 +2169,7 @@ function populateMenus(
   } as IFileMenu.ICloseAndCleaner<NotebookPanel>);
 
   // Add a notebook group to the File menu.
+  if (isExportNotebookEnable == "True") {
   const exportTo = new Menu({ commands });
   exportTo.title.label = trans.__('Export Notebook As…');
   void services.nbconvert.getExportFormats().then(response => {
@@ -2206,6 +2212,7 @@ function populateMenus(
       mainMenu.fileMenu.addGroup(fileGroup, 10);
     }
   });
+  }
 
   // Add a kernel user to the Kernel menu
   mainMenu.kernelMenu.kernelUsers.add({

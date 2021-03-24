@@ -47,10 +47,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const trans = translator.load('jupyterlab');
     const settings = await registry.load(plugin.id);
     let enabled = settings.composite['enabled'] === true;
+    // let ext_rem: boolean = false;
 
     const { commands, serviceManager } = app;
     let view: ExtensionView | undefined;
 
+    // if (ext_rem){
     const createView = () => {
       const v = new ExtensionView(app, serviceManager, settings, translator);
       v.id = 'extensionmanager.main-view';
@@ -94,7 +96,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           `Something went wrong when reading the settings.\n${reason}`
         );
       });
-
+    // if (ext_rem){
     commands.addCommand(CommandIDs.toggle, {
       label: trans.__('Enable Extension Manager'),
       execute: () => {
@@ -115,7 +117,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
     if (mainMenu) {
       mainMenu.settingsMenu.addGroup([{ command }], 100);
     }
+  // }
   }
+// }
 };
 
 /**

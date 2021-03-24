@@ -62,6 +62,8 @@ import {
   ITranslator
 } from '@jupyterlab/translation';
 
+let isDragDropEnabled = (<HTMLInputElement>document.getElementById('enable_drag&drop')).value;
+
 /**
  * The class name added to DirListing widget.
  */
@@ -1087,9 +1089,12 @@ export class DirListing extends Widget {
     if (!files || files.length === 0) {
       return;
     }
-    event.preventDefault();
-    for (let i = 0; i < files.length; i++) {
-      void this._model.upload(files[i]);
+    if (isDragDropEnabled == "True") {
+      event.preventDefault();
+
+      for (let i = 0; i < files.length; i++) {
+        void this._model.upload(files[i]);
+      }
     }
   }
 
@@ -1106,10 +1111,12 @@ export class DirListing extends Widget {
       if (item.type !== 'directory' || this._selection[item.name]) {
         return;
       }
-      const target = event.target as HTMLElement;
-      target.classList.add(DROP_TARGET_CLASS);
-      event.preventDefault();
-      event.stopPropagation();
+      if (isDragDropEnabled == "True") {
+        const target = event.target as HTMLElement;
+        target.classList.add(DROP_TARGET_CLASS);
+        event.preventDefault();
+        event.stopPropagation();
+      }
     }
   }
 
@@ -1120,8 +1127,10 @@ export class DirListing extends Widget {
     event.preventDefault();
     event.stopPropagation();
     const dropTarget = DOMUtils.findElement(this.node, DROP_TARGET_CLASS);
-    if (dropTarget) {
-      dropTarget.classList.remove(DROP_TARGET_CLASS);
+    if (isDragDropEnabled == "True") {
+      if (dropTarget) {
+        dropTarget.classList.remove(DROP_TARGET_CLASS);
+      }
     }
   }
 
@@ -1133,11 +1142,13 @@ export class DirListing extends Widget {
     event.stopPropagation();
     event.dropAction = event.proposedAction;
     const dropTarget = DOMUtils.findElement(this.node, DROP_TARGET_CLASS);
-    if (dropTarget) {
-      dropTarget.classList.remove(DROP_TARGET_CLASS);
+    if (isDragDropEnabled == "True") {
+      if (dropTarget) {
+        dropTarget.classList.remove(DROP_TARGET_CLASS);
+      }
+      const index = Private.hitTestNodes(this._items, event);
+      this._items[index].classList.add(DROP_TARGET_CLASS);
     }
-    const index = Private.hitTestNodes(this._items, event);
-    this._items[index].classList.add(DROP_TARGET_CLASS);
   }
 
   /**
@@ -1155,14 +1166,15 @@ export class DirListing extends Widget {
       return;
     }
 
-    let target = event.target as HTMLElement;
-    while (target && target.parentElement) {
-      if (target.classList.contains(DROP_TARGET_CLASS)) {
-        target.classList.remove(DROP_TARGET_CLASS);
-        break;
+    if (isDragDropEnabled == "True") {
+      let target = event.target as HTMLElement;
+      while (target && target.parentElement) {
+        if (target.classList.contains(DROP_TARGET_CLASS)) {
+          target.classList.remove(DROP_TARGET_CLASS);
+          break;
+        }
+        target = target.parentElement;
       }
-      target = target.parentElement;
-    }
 
     // Get the path based on the target node.
     const index = ArrayExt.firstIndexOf(this._items, target);
@@ -1204,6 +1216,7 @@ export class DirListing extends Widget {
       );
     });
   }
+  }
 
   /**
    * Start a drag event.
@@ -1229,15 +1242,15 @@ export class DirListing extends Widget {
     if (!item) {
       return;
     }
-
-    // Create the drag image.
-    const ft = this._manager.registry.getFileTypeForModel(item);
-    const dragImage = this.renderer.createDragImage(
-      source,
-      selectedNames.length,
-      this._trans,
-      ft
-    );
+    if (isDragDropEnabled == "True") {
+      // Create the drag image.
+      const ft = this._manager.registry.getFileTypeForModel(item);
+      const dragImage = this.renderer.createDragImage(
+        source,
+        selectedNames.length,
+        this._trans,
+        ft
+      );
 
     // Set up the drag event.
     this._drag = new Drag({
@@ -1312,6 +1325,7 @@ export class DirListing extends Widget {
       this._drag = null;
       clearTimeout(this._selectTimer);
     });
+  }
   }
 
   /**

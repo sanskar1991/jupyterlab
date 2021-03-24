@@ -11,6 +11,13 @@ import { fileUploadIcon } from '@jupyterlab/ui-components';
 
 import { FileBrowserModel } from './model';
 
+import { showDialog, Dialog } from '@jupyterlab/apputils';
+
+/**
+ * The variable which enables, disables the upload functionality
+ */
+// let isUploadEnable = (<HTMLInputElement>document.getElementById('disable_upload')).value;
+
 /**
  * A widget which provides an upload button.
  */
@@ -22,7 +29,16 @@ export class Uploader extends ToolbarButton {
     super({
       icon: fileUploadIcon,
       onClick: () => {
+        // if (isUploadEnable == "True"){
         this._input.click();
+        // }
+        // else {
+        showDialog({
+          title: "Upload",
+          body: "This operation cannot be performed",
+          buttons: [Dialog.okButton()]
+        }).catch(e => console.log(e));
+        // }
       },
       tooltip: Private.translateToolTip(options.translator)
     });

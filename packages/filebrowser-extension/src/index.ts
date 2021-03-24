@@ -75,6 +75,10 @@ import { Message } from '@lumino/messaging';
 
 import { Menu } from '@lumino/widgets';
 
+// import { showDialog, Dialog } from '@jupyterlab/apputils';
+
+let isDownloadEnable = (<HTMLInputElement>document.getElementById('disable_download')).value;
+
 /**
  * The command IDs used by the file browser plugin.
  */
@@ -575,17 +579,48 @@ function addCommands(
     label: trans.__('Cut')
   });
 
+  if (isDownloadEnable == "True"){
   commands.addCommand(CommandIDs.download, {
     execute: () => {
       const widget = tracker.currentWidget;
 
       if (widget) {
-        return widget.download();
-      }
+        // if (isDownloadEnable == "True"){
+          return widget.download();
+        // }
+        // else{
+        //   showDialog({
+        //     title: "Download",
+        //     body: "This operation cannot be performed",
+        //     buttons: [Dialog.okButton()]
+        //   }).catch(e => console.log(e));}
+          return
+        }
     },
     icon: downloadIcon.bindprops({ stylesheet: 'menuItem' }),
     label: trans.__('Download')
   });
+
+
+
+  commands.addCommand(CommandIDs.copyDownloadLink, {
+    execute: () => {
+      const widget = tracker.currentWidget;
+      if (!widget) {
+        return;
+      }
+
+      return widget.model.manager.services.contents
+        .getDownloadUrl(widget.selectedItems().next()!.path)
+        .then(url => {
+          Clipboard.copyToSystem(url);
+        });
+    },
+    icon: copyIcon.bindprops({ stylesheet: 'menuItem' }),
+    label: trans.__('Copy Download Link'),
+    mnemonic: 0
+  });
+  }
 
   commands.addCommand(CommandIDs.duplicate, {
     execute: () => {
@@ -750,24 +785,6 @@ function addCommands(
     },
     icon: addIcon.bindprops({ stylesheet: 'menuItem' }),
     label: trans.__('Open in New Browser Tab'),
-    mnemonic: 0
-  });
-
-  commands.addCommand(CommandIDs.copyDownloadLink, {
-    execute: () => {
-      const widget = tracker.currentWidget;
-      if (!widget) {
-        return;
-      }
-
-      return widget.model.manager.services.contents
-        .getDownloadUrl(widget.selectedItems().next()!.path)
-        .then(url => {
-          Clipboard.copyToSystem(url);
-        });
-    },
-    icon: copyIcon.bindprops({ stylesheet: 'menuItem' }),
-    label: trans.__('Copy Download Link'),
     mnemonic: 0
   });
 
@@ -1095,11 +1112,19 @@ function addCommands(
     selector: selectorNotDir,
     rank: 8
   });
+  if (isDownloadEnable == "True"){
   app.contextMenu.addItem({
     command: CommandIDs.download,
     selector: selectorNotDir,
     rank: 9
   });
+
+    app.contextMenu.addItem({
+      command: CommandIDs.copyDownloadLink,
+      selector: selectorNotDir,
+      rank: 13
+    });
+  }
   app.contextMenu.addItem({
     command: CommandIDs.shutdown,
     selector: selectorNotDir,
@@ -1115,11 +1140,6 @@ function addCommands(
     command: CommandIDs.copyPath,
     selector: selectorItem,
     rank: 12
-  });
-  app.contextMenu.addItem({
-    command: CommandIDs.copyDownloadLink,
-    selector: selectorNotDir,
-    rank: 13
   });
   app.contextMenu.addItem({
     command: CommandIDs.toggleLastModified,

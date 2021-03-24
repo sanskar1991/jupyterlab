@@ -33,7 +33,13 @@ import {
   ITranslator
 } from '@jupyterlab/translation';
 
+
 /**
+ * The variable which enables, disables the upload functionality
+ */
+let isUploadEnable = (<HTMLInputElement>document.getElementById('disable_upload')).value;
+
+ /**
  * The class name added to file browsers.
  */
 const FILE_BROWSER_CLASS = 'jp-FileBrowser';
@@ -95,7 +101,11 @@ export class FileBrowser extends Widget {
       },
       tooltip: this._trans.__('New Folder')
     });
-    const uploader = new Uploader({ model, translator: this.translator });
+
+    if (isUploadEnable == "True"){
+      const uploader = new Uploader({ model, translator: this.translator });
+      this.toolbar.addItem('upload', uploader);
+    }
 
     const refresher = new ToolbarButton({
       icon: refreshIcon,
@@ -106,7 +116,7 @@ export class FileBrowser extends Widget {
     });
 
     this.toolbar.addItem('newFolder', newFolder);
-    this.toolbar.addItem('upload', uploader);
+    // this.toolbar.addItem('upload', uploader);
     this.toolbar.addItem('refresher', refresher);
 
     this._listing = new DirListing({

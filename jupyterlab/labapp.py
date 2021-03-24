@@ -37,7 +37,12 @@ from .handlers.extension_manager_handler import (
     extensions_handler_path, ExtensionManager, ExtensionHandler
 )
 from .handlers.error_handler import ErrorHandler
-
+from .jupyterlab_config import (
+    isDownloadEnable,
+    isUploadEnable,
+    isExportNotebookEnable,
+    isDragDropEnabled
+)
 
 DEV_NOTE = """You're running JupyterLab from source.
 If you're working on the TypeScript sources of JupyterLab, try running
@@ -653,6 +658,11 @@ class LabApp(NBClassicConfigShimMixin, LabServerApp):
         page_config['token'] = self.serverapp.token
         page_config['exposeAppInBrowser'] = self.expose_app_in_browser
         page_config['quitButton'] = self.serverapp.quit_button
+        
+        page_config['isUploadEnable'] = isUploadEnable
+        page_config['isDownloadEnable'] = isDownloadEnable
+        page_config['isDragDropEnabled'] = isDragDropEnabled
+        page_config['isExportNotebookEnable'] = isExportNotebookEnable
 
         # Client-side code assumes notebookVersion is a JSON-encoded string
         page_config['notebookVersion'] = json.dumps(jpserver_version_info)
